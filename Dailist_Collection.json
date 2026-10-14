@@ -1,0 +1,537 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+		"name": "Dailist API Collection",
+		"description": "Postman Collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "createdUserId",
+			"value": "826240099",
+			"type": "string"
+		},
+		{
+			"key": "createdProjectId",
+			"value": "PRJ-099",
+			"type": "string"
+		},
+		{
+			"key": "createdTaskId",
+			"value": "TSK-099",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Get All Users",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code adalah 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Content-Type berupa application/json\", function () {",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+							"});",
+							"",
+							"pm.test(\"Response berupa array user yang valid\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an(\"array\");",
+							"    pm.expect(jsonData.length).to.be.greaterThan(0);",
+							"    const first = jsonData[0];",
+							"    pm.expect(first).to.have.property(\"id\");",
+							"    pm.expect(first).to.have.property(\"fullname\");",
+							"    pm.expect(first).to.have.property(\"email\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/users",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users"
+					]
+				},
+				"description": "Mengambil semua daftar user."
+			},
+			"response": []
+		},
+		{
+			"name": "2. Create User (POST)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code adalah 201 Created\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"User baru berhasil dibuat\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an(\"object\");",
+							"    pm.expect(jsonData.id).to.eql(\"826240099\");",
+							"    pm.expect(jsonData.username).to.eql(\"testrunner\");",
+							"    pm.collectionVariables.set(\"createdUserId\", jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"826240099\",\n    \"fullname\": \"Automated Test User\",\n    \"username\": \"testrunner\",\n    \"email\": \"testrunner@dailist.app\",\n    \"phone_number\": \"0812-9999-8888\",\n    \"role\": \"user\",\n    \"is_active\": true\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/users",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users"
+					]
+				},
+				"description": "Menambahkan user baru ke Dailist."
+			},
+			"response": []
+		},
+		{
+			"name": "3. Get User By ID (Success)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code adalah 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Data user sesuai dengan ID yang dicari\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an(\"object\");",
+							"    pm.expect(jsonData.id).to.eql(pm.collectionVariables.get(\"createdUserId\"));",
+							"    pm.expect(jsonData.username).to.eql(\"testrunner\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/users/{{createdUserId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users",
+						"{{createdUserId}}"
+					]
+				},
+				"description": "Mengambil detail profil user yang baru dibuat (chaining ID)."
+			},
+			"response": []
+		},
+		{
+			"name": "4. Update User (PUT)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code adalah 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Data user berhasil diupdate\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.fullname).to.eql(\"Automated Test User (Updated)\");",
+							"    pm.expect(jsonData.role).to.eql(\"editor\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"fullname\": \"Automated Test User (Updated)\",\n    \"role\": \"editor\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/users/{{createdUserId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users",
+						"{{createdUserId}}"
+					]
+				},
+				"description": "Mengubah data user."
+			},
+			"response": []
+		},
+		{
+			"name": "5. Delete User (DELETE)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code adalah 204 No Content\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/users/{{createdUserId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users",
+						"{{createdUserId}}"
+					]
+				},
+				"description": "Menghapus user."
+			},
+			"response": []
+		},
+		{
+			"name": "6. Get User By ID (Not Found - 404)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code adalah 404 Not Found\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"Pesan error data tidak ditemukan\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"Data tidak ditemukan\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/users/899999999",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users",
+						"899999999"
+					]
+				},
+				"description": "Pengujian negatif ketika user tidak ditemukan."
+			},
+			"response": []
+		},
+		{
+			"name": "7. Get All Projects",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code adalah 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response berupa array project yang valid\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an(\"array\");",
+							"    pm.expect(jsonData.length).to.be.greaterThan(0);",
+							"    pm.expect(jsonData[0]).to.have.property(\"name\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/projects",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"projects"
+					]
+				},
+				"description": "Mengambil daftar seluruh project."
+			},
+			"response": []
+		},
+		{
+			"name": "8. Create Project (POST)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code adalah 201 Created\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Project baru berhasil dibuat\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an(\"object\");",
+							"    pm.expect(jsonData.id).to.eql(\"PRJ-099\");",
+							"    pm.collectionVariables.set(\"createdProjectId\", jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"PRJ-099\",\n    \"name\": \"Automated Test Board\",\n    \"description\": \"Papan project pengujian\",\n    \"color\": \"#4A90E2\",\n    \"userId\": \"826240001\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/projects",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"projects"
+					]
+				},
+				"description": "Menambahkan project baru."
+			},
+			"response": []
+		},
+		{
+			"name": "9. Delete Project (DELETE)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code adalah 204 No Content\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/projects/{{createdProjectId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"projects",
+						"{{createdProjectId}}"
+					]
+				},
+				"description": "Menghapus project pengujian."
+			},
+			"response": []
+		},
+		{
+			"name": "10. Get All Tasks",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code adalah 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response berupa array tasks\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an(\"array\");",
+							"    pm.expect(jsonData.length).to.be.greaterThan(0);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/tasks",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"tasks"
+					]
+				},
+				"description": "Mengambil semua daftar tasks."
+			},
+			"response": []
+		},
+		{
+			"name": "11. Create Task (POST)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code adalah 201 Created\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Task baru berhasil dibuat\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.id).to.eql(\"TSK-099\");",
+							"    pm.expect(jsonData.title).to.eql(\"Automated Task Test\");",
+							"    pm.collectionVariables.set(\"createdTaskId\", jsonData.id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"TSK-099\",\n    \"title\": \"Automated Task Test\",\n    \"description\": \"Pengujian task card\",\n    \"status\": \"todo\",\n    \"priority\": \"high\",\n    \"dueDate\": \"2026-10-31\",\n    \"projectId\": \"PRJ-001\",\n    \"userId\": \"826240001\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/tasks",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"tasks"
+					]
+				},
+				"description": "Menambahkan task baru."
+			},
+			"response": []
+		},
+		{
+			"name": "12. Delete Task (DELETE)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code adalah 204 No Content\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/tasks/{{createdTaskId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"tasks",
+						"{{createdTaskId}}"
+					]
+				},
+				"description": "Menghapus task pengujian."
+			},
+			"response": []
+		}
+	]
+}
